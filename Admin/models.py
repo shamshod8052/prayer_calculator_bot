@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from helpers.reducer import text_reducer
-from .managers import UserManager
+from .managers import UserManager, QadaManager, Prayer, UserAdminManager
 
 
 class Channel(models.Model):
@@ -108,6 +108,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
 
     objects = UserManager()
+    tg_admins = UserAdminManager()
     USERNAME_FIELD = "telegram_id"
 
     class Meta:
@@ -127,3 +128,111 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         full_name = ' '.join([self.first_name or '', self.last_name or ''])
 
         return full_name.strip()
+
+class Qada(models.Model):
+    objects = QadaManager()
+
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='qadas',
+        db_index=True,
+        verbose_name=_('User')
+    )
+    prayer = models.CharField(
+        max_length=6,
+        choices=Prayer.choices,
+        db_index=True,
+        verbose_name=_('Prayer')
+    )
+    number = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_('Number of qada(Day)'),
+        help_text=_('Count of missed prayers to be made up')
+    )
+    last_updated = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Last updated'),
+        editable=False
+    )
+
+    class Meta:
+        verbose_name = _('Qada prayer')
+        verbose_name_plural = _('Qada prayers')
+        unique_together = ('user', 'prayer')
+        ordering = ['user']
+        indexes = [
+            models.Index(fields=['user', 'prayer']),
+            models.Index(fields=['last_updated']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(number__gte=0),
+                name='non_negative_qada_count'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.get_prayer_display()} ({self.number}) - {self.user}"
+
+    @property
+    def name(self):
+        return f"{Prayer(self.prayer).label}"
+
+    def increment(self, value=1, save=True):
+        """Atomically increment the qada count"""
+        if value < 0:
+            raise ValueError("Increment value must be positive")
+        self.number = models.F('number') + value
+        if save:
+            self.save(update_fields=['number', 'last_updated'])
+        return self
+
+    def decrement(self, value=1, save=True):
+        """Atomically decrement the qada count, preventing negative values"""
+        if value < 0:
+            raise ValueError("Decrement value must be positive")
+        self.number = models.F('number') - value
+        if save:
+            # Use Greatest to prevent negative numbers
+            self.number = models.functions.Greatest(models.F('number') - value, 0)
+            self.save(update_fields=['number', 'last_updated'])
+        return self
+
+    def reset(self, save=True):
+        """Reset the qada count to zero"""
+        self.number = 0
+        if save:
+            self.save(update_fields=['number', 'last_updated'])
+        return self
+
+    @property
+    def is_outstanding(self):
+        """Check if there are any qada prayers to make up"""
+        return self.number > 0
+
+
+class Region(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = "Region"
+        verbose_name_plural = "Regions"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    name = models.CharField(max_length=100)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='cities')
+
+    class Meta:
+        verbose_name = "City"
+        verbose_name_plural = "Cities"
+        unique_together = ('name', 'region')
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name}, {self.region.name}"

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from Admin.models import CustomUser
+from Admin.models import CustomUser, Qada
 from .models import Channel
 
 
@@ -47,6 +47,19 @@ class ChannelAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related()
 
 
+class QadaInline(admin.TabularInline):
+    model = Qada
+    extra = 0
+    min_num = 1
+    max_num = 6
+    can_delete = False
+    fields = ('prayer', 'number', 'last_updated')
+    readonly_fields = ('last_updated',)
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
@@ -76,9 +89,33 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('-id',)
     list_filter = ("is_staff", "is_superuser", "is_active", "language", "tg_status")
     readonly_fields = ("last_login", "date_joined")
+    inlines = (QadaInline,)
 
     def display_name(self, obj):
         return f"{obj}"
 
     display_name.short_description = _('Display name')
     display_name.admin_order_field = 'first_name'
+
+
+@admin.register(Qada)
+class QadaAdmin(admin.ModelAdmin):
+    list_display = ('user_info', 'prayer_display', 'number', 'last_updated')
+    list_filter = ('prayer', 'last_updated')
+    search_fields = ('user__chat_id', 'user__username', 'user__first_name', 'user__last_name')
+    readonly_fields = ('last_updated', )
+    fields = ('user', 'prayer', 'number', 'last_updated')
+    ordering = ('user', 'prayer')
+    list_per_page = 30
+
+    def user_info(self, obj):
+        return f"{obj.user}"
+
+    user_info.short_description = 'User'
+    user_info.admin_order_field = 'user__first_name'
+
+    def prayer_display(self, obj):
+        return obj.get_prayer_display()
+
+    prayer_display.short_description = _('Prayer')
+    prayer_display.admin_order_field = 'prayer'

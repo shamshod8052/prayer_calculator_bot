@@ -1,6 +1,37 @@
 from django.contrib import auth
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
+class Prayer(models.TextChoices):
+    BOMDOD = 'bomdod', _("Bomdod")
+    PESHIN = 'peshin', _('Peshin')
+    ASR = 'asr', _('Asr')
+    SHOM = 'shom', _('Shom')
+    XUFTON = 'xufton', _('Xufton')
+    VITR = 'vitr', _('Vitr')
+
+
+class QadaManager(models.Manager):
+    def _create_qada(self, user, prayer, number=0):
+        qada = self.model(user=user, prayer=prayer, number=number)
+        qada.save(using=self._db)
+        return qada
+
+    def create_qada(self, user, prayer, number=0):
+        return self._create_qada(user, prayer, number)
+
+    def create_default_qadas(self, user, number=0):
+        for prayer, name in Prayer.choices:
+            self.create_qada(user, prayer, number)
+
+
+class UserAdminManager(BaseUserManager):
+    use_in_migrations = True
+    def get_queryset(self):
+        return super().get_queryset().filter(is_tg_admin=True)
 
 
 class UserManager(BaseUserManager):
