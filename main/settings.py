@@ -212,13 +212,13 @@ LOGGING = {
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "Test Admin",
+    "site_title": "Prayer Admin",
 
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "TestAdmin",
+    "site_header": "PrayerAdmin",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "Test",
+    "site_brand": "Prayer",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
     # "site_logo": "books/img/logo.png",
@@ -236,10 +236,10 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Welcome to the \"Test\"  Admin panel",
+    "welcome_sign": "Welcome to the \"Prayer\"  Admin panel",
 
     # Copyright on the footer
-    "copyright": "Test",
+    "copyright": "Prayer",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you don't need to use a list, you can use a simple string
@@ -301,6 +301,10 @@ JAZZMIN_SETTINGS = {
         "Admin",
         "Admin.CustomUser",
         "Admin.Channel",
+        "Admin.FAQ",
+        "Admin.Province",
+        "Admin.District",
+        "Admin.Qada",
     ],
 
     # Custom links to append to app groups, keyed on app name
@@ -323,6 +327,10 @@ JAZZMIN_SETTINGS = {
         "Admin": "fas fa-user-shield",
         "Admin.CustomUser": "fas fa-user",
         "Admin.Channel": "fas fa-link",
+        "Admin.FAQ": "fas fa-question-circle",
+        "Admin.Province": "fas fa-map-marked-alt",
+        "Admin.District": "fas fa-city",
+        "Admin.Qada": "fas fa-history",
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
