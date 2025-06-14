@@ -147,8 +147,7 @@ class Qada(models.Model):
         max_length=6,
         choices=Prayer.choices,
         db_index=True,
-        verbose_name=_('Prayer'),
-        unique=True,
+        verbose_name=_('Prayer')
     )
     number = models.PositiveIntegerField(
         default=0,
