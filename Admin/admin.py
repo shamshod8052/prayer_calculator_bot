@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from Admin.models import CustomUser, Qada
+from Admin.models import CustomUser, Qada, Province, District, FAQ
 from .models import Channel
 
 
@@ -54,7 +54,7 @@ class QadaInline(admin.TabularInline):
     max_num = 6
     can_delete = False
     fields = ('prayer', 'number', 'last_updated')
-    readonly_fields = ('last_updated',)
+    readonly_fields = ('prayer', 'last_updated',)
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -102,10 +102,10 @@ class CustomUserAdmin(UserAdmin):
 class QadaAdmin(admin.ModelAdmin):
     list_display = ('user_info', 'prayer_display', 'number', 'last_updated')
     list_filter = ('prayer', 'last_updated')
-    search_fields = ('user__chat_id', 'user__username', 'user__first_name', 'user__last_name')
+    search_fields = ('user__telegram_id', 'user__username', 'user__first_name', 'user__last_name')
     readonly_fields = ('last_updated', )
     fields = ('user', 'prayer', 'number', 'last_updated')
-    ordering = ('user', 'prayer')
+    ordering = ('id',)
     list_per_page = 30
 
     def user_info(self, obj):
@@ -119,3 +119,27 @@ class QadaAdmin(admin.ModelAdmin):
 
     prayer_display.short_description = _('Prayer')
     prayer_display.admin_order_field = 'prayer'
+
+class DistrictInline(admin.TabularInline):
+    model = District
+    extra = 0
+
+@admin.register(Province)
+class ProvinceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active')
+    search_fields = ('name',)
+    list_filter = ('is_active',)
+    inlines = (DistrictInline,)
+
+@admin.register(District)
+class DistrictAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'province', 'is_active')
+    search_fields = ('name', 'slug')
+    list_filter = ('province', 'is_active',)
+
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ('question', 'answer', 'is_active')
+    search_fields = ('question', 'answer')
+    list_filter = ('is_active',)

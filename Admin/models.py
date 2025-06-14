@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
@@ -7,7 +9,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from helpers.reducer import text_reducer
-from .managers import UserManager, QadaManager, Prayer, UserAdminManager
+from helpers.tele_bot import tele_bot
+from .managers import UserManager, QadaManager, Prayer, UserAdminManager, ActiveManager, ActiveManager
+from .prayer import PresentDay
 
 
 class Channel(models.Model):
@@ -143,7 +147,8 @@ class Qada(models.Model):
         max_length=6,
         choices=Prayer.choices,
         db_index=True,
-        verbose_name=_('Prayer')
+        verbose_name=_('Prayer'),
+        unique=True,
     )
     number = models.PositiveIntegerField(
         default=0,
@@ -160,7 +165,7 @@ class Qada(models.Model):
         verbose_name = _('Qada prayer')
         verbose_name_plural = _('Qada prayers')
         unique_together = ('user', 'prayer')
-        ordering = ['user']
+        ordering = ['id']
         indexes = [
             models.Index(fields=['user', 'prayer']),
             models.Index(fields=['last_updated']),
@@ -212,27 +217,131 @@ class Qada(models.Model):
         return self.number > 0
 
 
-class Region(models.Model):
+class Province(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    slug = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
+
+    actives = ActiveManager()
 
     class Meta:
-        verbose_name = "Region"
-        verbose_name_plural = "Regions"
+        verbose_name = _("Province")
+        verbose_name_plural = _("Provinces")
         ordering = ['name']
 
     def __str__(self):
         return self.name
 
 
-class City(models.Model):
+class District(models.Model):
     name = models.CharField(max_length=100)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='cities')
+    slug = models.CharField(max_length=100, unique=True)
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, related_name='districts')
+    is_active = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    actives = ActiveManager()
 
     class Meta:
-        verbose_name = "City"
-        verbose_name_plural = "Cities"
-        unique_together = ('name', 'region')
+        verbose_name = _("District")
+        verbose_name_plural = _("Districts")
+        unique_together = ('name', 'province', 'slug')
         ordering = ['name']
 
     def __str__(self):
-        return f"{self.name}, {self.region.name}"
+        return f"{self.name}, {self.province.name}"
+
+    @property
+    def prayer_time(self):
+        return PresentDay(self.name, self.province.slug)
+
+
+class FAQ(models.Model):
+    question = models.TextField(verbose_name=_('Question'))
+    answer = models.TextField(verbose_name=_('Answer'))
+    video = models.FileField(verbose_name=_('Video'), upload_to='faq_videos', blank=True, null=True)
+    photo = models.ImageField(verbose_name=_('Photo'), upload_to='faq_photos', blank=True, null=True)
+    voice = models.FileField(verbose_name=_('Voice'), upload_to='faq_voices', blank=True, null=True)
+    video_file_id = models.CharField(max_length=100, null=True, blank=True, editable=False)
+    photo_file_id = models.CharField(max_length=100, null=True, blank=True, editable=False)
+    voice_file_id = models.CharField(max_length=100, null=True, blank=True, editable=False)
+    saved_video_path = models.CharField(_('Saved Video Path'), max_length=255, null=True, blank=True, editable=False)
+    saved_photo_path = models.CharField(_('Saved Photo Path'), max_length=255, null=True, blank=True, editable=False)
+    saved_voice_path = models.CharField(_('Saved Voice Path'), max_length=255, null=True, blank=True, editable=False)
+
+    created_at = models.DateTimeField(verbose_name=_("Created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name=_("Updated at"), auto_now=True)
+    is_active = models.BooleanField(verbose_name=_("Is active"), default=True)
+
+    actives = ActiveManager()
+
+    class Meta:
+        verbose_name = _("FAQ")
+        verbose_name_plural = _("FAQs")
+        ordering = ['id']
+
+    def __str__(self):
+        return text_reducer(self.question, 32)
+
+    def is_video_synchronized(self):
+        return self.video and self.video.path == self.saved_video_path
+
+    def is_photo_synchronized(self):
+        return self.photo and self.photo.path == self.saved_photo_path
+
+    def is_voice_synchronized(self):
+        return self.voice and self.voice.path == self.saved_voice_path
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        updated_fields = []
+
+        # VIDEO
+        if not self.is_video_synchronized():
+            try:
+                with open(self.video.path, 'rb') as f:
+                    response = tele_bot.send_video(
+                        chat_id=settings.DEFAULT_BOT_CHAT,
+                        video=f
+                    )
+            except Exception as e:
+                logging.error(f"[FAQ][Video] Telegramga yuborishda xatolik: {e}")
+            else:
+                self.video_file_id = response.video.file_id
+                self.saved_video_path = self.video.path
+                updated_fields += ['video_file_id', 'saved_video_path']
+
+        # PHOTO
+        if not self.is_photo_synchronized():
+            try:
+                with open(self.photo.path, 'rb') as f:
+                    response = tele_bot.send_photo(
+                        chat_id=settings.DEFAULT_BOT_CHAT,
+                        photo=f
+                    )
+            except Exception as e:
+                logging.error(f"[FAQ][Photo] Telegramga yuborishda xatolik: {e}")
+            else:
+                self.photo_file_id = response.photo[-1].file_id  # eng katta o‘lcham
+                self.saved_photo_path = self.photo.path
+                updated_fields += ['photo_file_id', 'saved_photo_path']
+
+        # VOICE
+        if not self.is_voice_synchronized():
+            try:
+                with open(self.voice.path, 'rb') as f:
+                    response = tele_bot.send_voice(
+                        chat_id=settings.DEFAULT_BOT_CHAT,
+                        voice=f
+                    )
+            except Exception as e:
+                logging.error(f"[FAQ][Voice] Telegramga yuborishda xatolik: {e}")
+            else:
+                self.voice_file_id = response.voice.file_id
+                self.saved_voice_path = self.voice.path
+                updated_fields += ['voice_file_id', 'saved_voice_path']
+
+        # Update only if needed
+        if updated_fields:
+            super().save(update_fields=updated_fields)

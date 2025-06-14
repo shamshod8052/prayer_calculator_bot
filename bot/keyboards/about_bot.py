@@ -6,6 +6,8 @@ def about_bot_kb():
         inline_keyboard=[
             [
                 InlineKeyboardButton(text="Botni ishlatish bo'yicha video", callback_data="bot_video"),
+            ],
+            [
                 InlineKeyboardButton(text="Savol yuborish", callback_data="send_question"),
             ],
             [
