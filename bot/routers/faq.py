@@ -19,12 +19,13 @@ async def view_faq(call: types.CallbackQuery):
         page_num = 1
     quests_num = 10
     text = "<b>Ko'p beriladigan savollar</b>\n\n"
+    begin = (page_num - 1) * quests_num
+    end = page_num * quests_num
     text += '\n'.join(
         [
             f"{n + 1}. {faq.question}"
-            for n, faq in enumerate(
-            FAQ.actives.all()[(page_num - 1) * quests_num:page_num * quests_num]
-        )
+            for n, faq in zip(
+                range(begin, end), FAQ.actives.all()[begin:end])
         ]
     )
     rows_list = [
