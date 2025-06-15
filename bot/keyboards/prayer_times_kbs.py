@@ -19,7 +19,7 @@ def province_kb(page_num=1):
     )
 
     back = BackButton(text="Orqaga", callback_data="main_menu")
-    paginator = Paginator(rows_list, 5, back, True, True)
+    paginator = Paginator(rows_list, 5, back, True)
     page = paginator.get_page(page_num, 'province').as_markup()
 
     return page
@@ -32,7 +32,7 @@ def district_kb(province_id, page_num=1):
     it = iter(buttons)
     rows_list = list(iter(lambda: list(islice(it, 1)), []))
     back = BackButton(text="Orqaga", callback_data="prayer_times")
-    paginator = Paginator(rows_list, 5, back, True, True)
+    paginator = Paginator(rows_list, 5, back, True)
     page = paginator.get_page(page_num, f"district:{province_id}")
 
     return page.as_markup()
