@@ -7,11 +7,11 @@ from django.utils.translation import gettext_lazy as _
 
 class Prayer(models.TextChoices):
     BOMDOD = 'bomdod', _("Bomdod")
-    QUYOSH = 'quyosh', _('Quyosh')
     PESHIN = 'peshin', _('Peshin')
     ASR = 'asr', _('Asr')
     SHOM = 'shom', _('Shom')
     XUFTON = 'xufton', _('Xufton')
+    VITR = 'vitr', _('Vitr')
 
 
 class QadaManager(models.Manager):
@@ -32,6 +32,12 @@ class UserAdminManager(BaseUserManager):
     use_in_migrations = True
     def get_queryset(self):
         return super().get_queryset().filter(is_tg_admin=True)
+
+
+class TgUserActiveManager(BaseUserManager):
+    use_in_migrations = True
+    def get_queryset(self):
+        return super().get_queryset().filter(tg_status__in=[1, 5])
 
 
 class UserManager(BaseUserManager):

@@ -10,7 +10,8 @@ from django.utils.translation import gettext_lazy as _
 
 from helpers.reducer import text_reducer
 from helpers.tele_bot import tele_bot
-from .managers import UserManager, QadaManager, Prayer, UserAdminManager, ActiveManager, ActiveManager
+from .managers import UserManager, QadaManager, Prayer, UserAdminManager, ActiveManager, ActiveManager, \
+    TgUserActiveManager
 from .prayer import PresentDay
 
 
@@ -112,6 +113,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
 
     objects = UserManager()
+    actives = TgUserActiveManager()
     tg_admins = UserAdminManager()
     USERNAME_FIELD = "telegram_id"
 
