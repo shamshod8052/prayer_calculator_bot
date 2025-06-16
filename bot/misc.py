@@ -33,13 +33,12 @@ async def scheduler(bot_):
     schedule = AsyncIOScheduler(timezone='Asia/Tashkent')
     if settings.DEBUG:
         new_now = now() + datetime.timedelta(seconds=10)
-        hour, minute, second = new_now.hour, new_now.minute, new_now.second
     else:
-        hour, minute, second = datetime.datetime.strptime(settings.QADA_NOTICE_TIME, "%H:%M:%S")
+        new_now = datetime.datetime.strptime(settings.QADA_NOTICE_TIME, "%H:%M:%S")
     schedule.add_job(
         qada_keyboard_sender, trigger='cron', args=[bot_],
         start_date=datetime.datetime.now(pytz.timezone('Asia/Tashkent')),
-        hour=hour, minute=minute, second=second
+        hour=new_now.hour, minute=new_now.minute, second=new_now.second
     )
     schedule.start()
 
