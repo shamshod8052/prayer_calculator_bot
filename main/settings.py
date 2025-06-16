@@ -19,7 +19,7 @@ DB_PORT = env.str('DB_PORT')
 DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = ['*']
-HOST = os.environ['HOST']
+HOST = env.str('HOST')
 CSRF_TRUSTED_ORIGINS = [HOST]
 
 DEFAULT_BOT_CHAT=1019133305
@@ -95,11 +95,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'CONN_MAX_AGE': None,
-        'NAME': os.environ['DB_NAME'],
-        'USER': os.environ['DB_USER'],
-        'PASSWORD': os.environ['DB_PASS'],
-        'HOST': os.environ['DB_HOST'],
-        'PORT': os.environ['DB_PORT'],
+        'NAME': env.str('DB_NAME'),
+        'USER': env.str('DB_USER'),
+        'PASSWORD': env.str('DB_PASS'),
+        'HOST': env.str('DB_HOST'),
+        'PORT': env.str('DB_PORT'),
     }
 }
 if DEBUG:
@@ -114,7 +114,7 @@ if DEBUG:
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.environ['REDIS_URL'],
+        "LOCATION": env.str('REDIS_URL'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -182,9 +182,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Bot settings
-BOT_TOKEN = os.environ['BOT_TOKEN']
-ADMINS = os.environ['ADMINS'].split(',')
+BOT_TOKEN = env.str('BOT_TOKEN')
+ADMINS = env.str('ADMINS').split(',')
 BOT_WEBHOOK_PATH = "bot-process-updates"
+QADA_NOTICE_TIME = env.str('QADA_NOTICE_TIME')
 
 LIFESPAN_CONTEXT = 'main.lifespan.lifespan_context'
 
