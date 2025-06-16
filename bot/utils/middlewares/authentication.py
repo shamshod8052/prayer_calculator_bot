@@ -17,15 +17,15 @@ class AuthenticationMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         user, is_created = await User.objects.aget_or_create(telegram_id=bot_user.id)
-        if is_created:
+        if user.qadas.exists():
             user.qadas.create_default_qadas(user)
+            data['is_created_user'] = True
         user.first_name = bot_user.first_name
         user.last_name = bot_user.last_name
         user.username = bot_user.username
         await user.asave()
 
         data['user'] = user
-        data['is_created_user'] = is_created
 
         if (event.message and event.message.chat.type != 'private' or
                 event.callback_query and event.callback_query.message.chat.type != 'private'):
