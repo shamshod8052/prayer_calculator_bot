@@ -17,7 +17,8 @@ class AuthenticationMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         user, is_created = await User.objects.aget_or_create(telegram_id=bot_user.id)
-        if user.qadas.exists():
+        data['is_created_user'] = False
+        if not user.qadas.exists():
             user.qadas.create_default_qadas(user)
             data['is_created_user'] = True
         user.first_name = bot_user.first_name
