@@ -15,17 +15,11 @@ class AuthenticationMiddleware(BaseMiddleware):
         bot_user = data['event_from_user']
         if bot_user is None:
             return await handler(event, data)
-
         user, is_created = await User.objects.aget_or_create(telegram_id=bot_user.id)
-        data['is_created_user'] = False
-        if not user.qadas.exists():
-            user.qadas.create_default_qadas(user)
-            data['is_created_user'] = True
         user.first_name = bot_user.first_name
         user.last_name = bot_user.last_name
         user.username = bot_user.username
         await user.asave()
-
         data['user'] = user
 
         if (event.message and event.message.chat.type != 'private' or
@@ -33,10 +27,14 @@ class AuthenticationMiddleware(BaseMiddleware):
             return
 
         is_subscribed, channels_kb = await is_user_subscribed(event.bot, bot_user.id)
-
         if not is_subscribed:
             text = _("Please subscribe to the following channels:\n\n"
                      "Once subscribed, send the /start command again.")
             return await event.message.answer(str(text), reply_markup=channels_kb)
+
+        data['is_created_user'] = False
+        if not user.qadas.exists():
+            user.qadas.create_default_qadas(user)
+            data['is_created_user'] = True
 
         return await handler(event, data)
