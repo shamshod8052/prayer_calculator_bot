@@ -15,3 +15,10 @@ async def admin_commands(message: types.Message):
     )
 
     await message.answer(commands)
+
+
+@router.message(Command("admin"))
+async def admin_commands(message: types.Message):
+    commands = "Afsus, siz admin emassiz!"
+
+    await message.answer(commands)
