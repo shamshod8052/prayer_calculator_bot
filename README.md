@@ -57,8 +57,8 @@ Loyiha **Django** va **Aiogram 3** yordamida yaratilgan bo‘lib, ma’lumotlar 
 
 1. **Ushbu repositoryni klonlab oling:**
    ```bash
-   git clone https://github.com/username/namoz-vaqti-bot.git
-   cd namoz-vaqti-bot
+   git clone https://github.com/shamshod8052/prayer_calculator_bot.git
+   cd prayer_calculator_bot
    ```
 2.
    ```bash
