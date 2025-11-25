@@ -1,6 +1,7 @@
 # 🕌 Namoz Vaqti Bot
 
 > Bu bot namoz qazolaringizni doimiy hisoblab borishda ko'maklashadi. Viloyatlar bo'yicha namoz vaqtlarini ko'rsatadi. Qazolar sonini qo'lda o'zgartirish ham mumkin. Har kunlik qaysi namozlarni o'qidi yoki yo'q — barchasi maxsus tugmali so'rovnoma orqali bazaga kiritiladi.
+> Bot: @tafsoft_namoz_bot
 
 ---
 
