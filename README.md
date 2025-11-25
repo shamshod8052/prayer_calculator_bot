@@ -17,13 +17,16 @@
 Loyiha **Django** va **Aiogram 3** yordamida yaratilgan bo‘lib, ma’lumotlar bazasi orqali statistikani ham saqlaydi.
 
 ---
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/9af9e013-5f4c-49de-a30d-3f0348a9dcfb" />
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/e33ee40c-b27f-42c4-b6c2-c1a51e6ab884" />
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/2a08302f-6508-4344-a4b2-fd6845ddb344" />
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/8442f9bc-6613-444f-a8ef-60e34a4c57f7" />
-
-
-
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/9af9e013-5f4c-49de-a30d-3f0348a9dcfb" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/e33ee40c-b27f-42c4-b6c2-c1a51e6ab884" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/2a08302f-6508-4344-a4b2-fd6845ddb344" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/8442f9bc-6613-444f-a8ef-60e34a4c57f7" />
+<img width="500" height="879" alt="image" src="https://github.com/user-attachments/assets/fc141d0a-ff85-406e-b71b-dda04cb35196" />
+<img width="500" height="879" alt="image" src="https://github.com/user-attachments/assets/27866b5f-7311-4caa-9eb4-c1fc2e02e672" />
+<img width="500" height="879" alt="image" src="https://github.com/user-attachments/assets/2060ea3f-f435-4249-9a85-54d8d19c398f" />
+<img width="500" height="879" alt="image" src="https://github.com/user-attachments/assets/62cefdf5-29ef-4d84-9377-fc7719303e98" />
+<img width="500" height="879" alt="image" src="https://github.com/user-attachments/assets/d48feb7d-24d2-4d6e-9e14-c753e7bfd09e" />
+<img width="500" height="879" alt="image" src="https://github.com/user-attachments/assets/7a49c719-c103-49a2-9faa-c6f6cea16caf" />
 
 
 ## 📦 Tech Stack
