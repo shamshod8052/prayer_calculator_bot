@@ -20,7 +20,8 @@ Loyiha **Django** va **Aiogram 3** yordamida yaratilgan bo‘lib, ma’lumotlar 
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/9af9e013-5f4c-49de-a30d-3f0348a9dcfb" />
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/e33ee40c-b27f-42c4-b6c2-c1a51e6ab884" />
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/2a08302f-6508-4344-a4b2-fd6845ddb344" />
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/0d4a7120-3473-49da-b144-b917ffb91f43" />
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/8442f9bc-6613-444f-a8ef-60e34a4c57f7" />
+
 
 
 
